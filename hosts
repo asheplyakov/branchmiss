@@ -1,0 +1,2 @@
+[branchmiss-demo]
+localhost ansible_connection=local

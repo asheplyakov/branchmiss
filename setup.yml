@@ -1,0 +1,6 @@
+---
+
+- hosts:
+    - branchmiss-demo
+  roles:
+    - branchmiss-demo

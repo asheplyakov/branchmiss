@@ -1,0 +1,10 @@
+*.sw[opn]
+partsum
+partsum_opt
+rand_partsum
+rand_partsum_opt
+rand_partsum_nobranch
+rand_partsum_nobranch_opt
+rand_partsum_swap
+rand_partsum_swap_opt
+sum_opt
