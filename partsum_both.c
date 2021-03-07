@@ -84,15 +84,15 @@ int main(int argc, char **argv) {
 }
 
 /*  
- * gcc-8 -O0 -g -fno-omit-frame-pointer -static -o randsum_both randsum_both.c
+ * gcc-8 -O0 -g -fno-omit-frame-pointer -static -o partsum_both partsum_both.c
  *
- * perf record -o bmiss.data -g --call-graph=fp --event=branch-miss ./randsum_both
- * perf script -i bmiss.data > randsum_both_branchmiss.txt
- * stackcollapse-perf.pl < randsum_both_branchmiss.txt > randsum_both_branchmiss.stacks
- * flamegraph.pl --title "Branch misses" randsum_both_branchmiss.stacks > randsum_both_branchmiss.svg
+ * perf record -o bmiss.data -g --call-graph=fp --event=branch-miss ./partsum_both
+ * perf script -i bmiss.data > partsum_both_branchmiss.txt
+ * stackcollapse-perf.pl < partsum_both_branchmiss.txt > partsum_both_branchmiss.stacks
+ * flamegraph.pl --title "Branch misses" partsum_both_branchmiss.stacks > partsum_both_branchmiss.svg
  *
- * perf record -o cycles.data -g --call-graph=fp ./randsum_both
- * perf script -i cycles.data > randsum_both_cycles.txt
- * stackcollapse-perf.pl < randsum_both_cycles.txt > randsum_both_cycles.stacks
- * flamegraph.pl --title "Cycles" randsum_both_cycles.stacks > randsum_both_cycles.svg
+ * perf record -o cycles.data -g --call-graph=fp ./partsum_both
+ * perf script -i cycles.data > partsum_both_cycles.txt
+ * stackcollapse-perf.pl < partsum_both_cycles.txt > partsum_both_cycles.stacks
+ * flamegraph.pl --title "Cycles" partsum_both_cycles.stacks > partsum_both_cycles.svg
  */
