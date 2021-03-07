@@ -1,0 +1,33 @@
+
+cflags_debug = -O0 -g -fno-omit-frame-pointer
+cflags = -O2 -g -fno-omit-frame-pointer -fno-optimize-sibling-calls
+
+stackcollapse = ./3rdparty/FlameGraph/stackcollapse-perf.pl
+flamegraph = ./3rdparty/FlameGraph/flamegraph.pl
+
+rule cc_static_debug
+   command = gcc-8 $cflags_debug -static -o $out $in
+
+rule cc_static
+   command = gcc-8 $cflags -static -o $out $in
+
+rule profile
+   command = perf record --event=branch-miss --call-graph=fp -o $out ./$in
+
+rule visualize
+   command = perf script --header -i $in | $stackcollapse | $flamegraph --title "$title" > $out
+    
+
+build ./partsum_both: cc_static_debug partsum_both.c
+
+build ./partsum_both_opt: cc_static partsum_both.c
+
+build bmiss.data: profile ./partsum_both
+
+build bmiss_opt.data: profile ./partsum_both_opt
+
+build partsum_both_branchmiss.svg: visualize bmiss.data
+   title = Branch misses, no optimization
+
+build partsum_both_opt_branchmiss.svg: visualize bmiss_opt.data
+   title = Branch misses, -O2
