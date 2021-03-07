@@ -1,0 +1,72 @@
+---
+
+- name: check kernel.perf_event_paranoid knob
+  command: sysctl -n kernel.perf_event_paranoid
+  register: perf_event_paranoid_out
+  changed_when: False
+
+- name: disable kernel.perf_event_paranoid
+  command: sysctl -w kernel.perf_event_paranoid=0
+  when:
+    - revert is undefined or not(revert|default('false')|bool)
+    - perf_event_paranoid_out.stdout_lines[0] != '0'
+  become: true
+
+- name: enable kernel.perf_event_paranoid
+  command: sysctl -w kernel.perf_event_paranoid=1
+  when:
+    - revert is defined and revert|bool
+    - perf_event_paranoid_out.stdout_lines[0] == '0'
+  become: true
+
+- name: check kernel.kptr_restrict
+  command: sysctl -n kernel.kptr_restrict
+  register: kptr_restrict_out
+  changed_when: False
+
+- name: disable kernel.kptr_restrict
+  command: sysctl -w kernel.kptr_restrict=0
+  when:
+    - revert is undefined or not(revert|default('false')|bool)
+    - kptr_restrict_out.stdout_lines[0] != '0'
+  become: true
+
+- name: ensure /boot directory is world readable
+  file:
+    path: /boot
+    state: directory
+    mode: 0755
+  when:
+    - revert is undefined or not(revert|default('false')|bool)
+  become: true
+
+- name: figure out version of running kernel
+  command: uname -r
+  register: uname_r
+  changed_when: False
+
+- name: ensure System.map of currently running kernel is world readable
+  file:
+    path: "/boot/System.map-{{ uname_r.stdout_lines[0] }}"
+    mode: 0644
+  when:
+    - revert is undefined or not(revert|default('false')|bool)
+  become: true
+
+- name: ensure System.map of currently running kernel is readable by root only
+  file:
+    path: "/boot/System.map-{{ uname_r.stdout_lines[0] }}"
+    mode: 0600
+  when:
+    - revert is defined and revert|bool
+  become: true
+
+- name: ensure /boot is readable by root only
+  file:
+    path: /boot
+    state: directory
+    mode: 0700
+  when:
+    - revert is defined and revert|bool
+    - ansible_os_family == 'Altlinux'
+  become: true

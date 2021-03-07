@@ -1,7 +1,9 @@
 ---
 
+# restore broken^W "secure" defaults
+
 - hosts:
     - branchmiss-demo
   roles:
-    - branchmiss-demo
     - role: profiling_nonroot
+      revert: true
