@@ -171,6 +171,31 @@ If the branch got mispredicted the pipeline must be reset (expensive!)
 
 ---
 
+## Finding branch misses with perf
+
+Often it's far from obvious where exactly branch misses occur.
+Use a sampling profiler: `perf record`. Sample branch misses,
+and visualize the result as a [flame graph](http://www.brendangregg.com/flamegraphs.html)
+
+* What's a sampling profiler?
+* How do I sample branch misses?
+* What's a flame graph?
+
+---
+
+```bash
+gcc-8 -O0 -g -static -o partsum_both partsum_both.c
+perf record --event=branch-miss --call-graph=fp ./partsum_both -o randsum_both.data
+perf script --header -i randsum_both.data > randsum_both.perfscript
+stackcollapse-perf.pl randsum_both.perfscript > randsum_both.stacks
+flamegraph.pl --title='Branch misses, no optimization' randsum_both.stacks > randsum_both.svg
+```
+
+* Sampling: interrupt program on an event, save program stack trace
+* Flame graph: representation of collected stack traces
+
+![branch misses flamegraph](partsum_both.svg)
+
 
 ## Dealing with branch misses
 

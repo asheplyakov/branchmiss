@@ -28,15 +28,15 @@ rule visualize
     
 
 build ./partsum_both: cc_static_debug partsum_both.c
-build bmiss.data: profile ./partsum_both
-build bmiss.perf.script: perf_script bmiss.data
-build bmiss.stacks: collapse_stacks bmiss.perf.script
-build partsum_both_branchmiss.svg: do_flamegraph bmiss.stacks
+build partsum_both.data: profile ./partsum_both
+build partsum_both.perfscript: perf_script partsum_both.data
+build partsum_both.stacks: collapse_stacks partsum_both.perfscript
+build partsum_both.svg: do_flamegraph partsum_both.stacks
    title = Branch misses, no optimization
 
 build ./partsum_both_opt: cc_static partsum_both.c
-build bmiss_opt.data: profile ./partsum_both_opt
-build bmiss_opt.perf.script: perf_script bmiss_opt.data
-build bmiss_opt.stacks: collapse_stacks bmiss_opt.perf.script
-build partsum_both_opt_branchmiss.svg: do_flamegraph bmiss_opt.stacks
+build partsum_both_opt.data: profile ./partsum_both_opt
+build partsum_both_opt.perf.script: perf_script partsum_both_opt.data
+build partsum_both_opt.stacks: collapse_stacks partsum_both_opt.perf.script
+build partsum_both_opt_branchmiss.svg: do_flamegraph partsum_both_opt.stacks
    title = Branch misses, -O2
