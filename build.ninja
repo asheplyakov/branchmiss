@@ -14,20 +14,29 @@ rule cc_static
 rule profile
    command = perf record --event=branch-miss --call-graph=fp -o $out ./$in
 
+rule perf_script
+   command = perf script --header -i $in > $out
+
+rule collapse_stacks
+   command = $stackcollapse $in > $out
+
+rule do_flamegraph
+   command = $flamegraph --title "$title" $in > $out
+
 rule visualize
    command = perf script --header -i $in | $stackcollapse | $flamegraph --title "$title" > $out
     
 
 build ./partsum_both: cc_static_debug partsum_both.c
-
-build ./partsum_both_opt: cc_static partsum_both.c
-
 build bmiss.data: profile ./partsum_both
-
-build bmiss_opt.data: profile ./partsum_both_opt
-
-build partsum_both_branchmiss.svg: visualize bmiss.data
+build bmiss.perf.script: perf_script bmiss.data
+build bmiss.stacks: collapse_stacks bmiss.perf.script
+build partsum_both_branchmiss.svg: do_flamegraph bmiss.stacks
    title = Branch misses, no optimization
 
-build partsum_both_opt_branchmiss.svg: visualize bmiss_opt.data
+build ./partsum_both_opt: cc_static partsum_both.c
+build bmiss_opt.data: profile ./partsum_both_opt
+build bmiss_opt.perf.script: perf_script bmiss_opt.data
+build bmiss_opt.stacks: collapse_stacks bmiss_opt.perf.script
+build partsum_both_opt_branchmiss.svg: do_flamegraph bmiss_opt.stacks
    title = Branch misses, -O2
