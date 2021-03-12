@@ -196,6 +196,81 @@ flamegraph.pl --title='Branch misses, no optimization' randsum_both.stacks > ran
 
 ![branch misses flamegraph](partsum_both.svg)
 
+---
+
+### How sampling works (bird's-eye view)
+
+* Hardware: Performance monitoring unit (PMU). Programmable event counters.
+  Raise an interrupt on N events (CPU cycles, branch misses, cache misses, etc)
+* Software: kernel: set counters, handle interrupts, etc
+* Software: perf: further event processing (which process was on CPU,
+  walk stack trace, record the sample)
+
+---
+
+### Obtaining stack traces
+
+#### Option 1: frame pointers
+
+```
+perf record --event=branch-miss --call-graph=fp ./partsum_both -o randsum_both.data
+```
+
+* Debug info (compile with `-g`)
+* Frame pointers (`-fno-omit-frame-pointer`)
+
+Pros:
+
++ Low run time overhead
++ Does not depend on advanced PMU features
+
+Cons:
+
+- Compilers don't preserve frame pointers by default
+- All libraries used by app should be compiled with frame pointers
+
+
+#### Option 2: DWARF debug info
+
+```
+perf record --event=branch-miss --call-graph=dwarf ./partsum_both -o randsum_both.data
+```
+
+* Debug info (compile with `-g`)
+
+Pros:
+
++ Distro software can be profiled
++ Does not depend on advanced PMU features
+
+Cons:
+
+- Extreme run time overhead
+- Truncated stack traces
+
+ 
+#### Option 3: advanced PMU features
+
+```
+perf record --event=branch-miss --call-graph=lbr ./partsum_both -o randsum_both.data
+```
+
+Pros:
+
++ Negligible run time overhead
++ Does not need debug info
+
+Cons:
+
+- Available only in some CPUs (Intel Haswell)
+- Only userspace stack can be recorded
+
+
+#### Kernel part of stack trace
+
+* `System.map` should be readable
+* `/proc/kallsyms` should be readable (`kernel.kptr_restrict=0`)
+
 
 ## Dealing with branch misses
 
