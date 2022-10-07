@@ -12,7 +12,7 @@
 - name: install Python 3 and numpy on ALT Linux
   package: name={{ item }} state=present
   with_items:
-    - ipython3
+    - python3
     - python3-module-numpy
   when: ansible_os_family == 'Altlinux'
   become: true
@@ -52,5 +52,14 @@
 
 - name: install perf on ALT Linux
   package: name=perf state=present
+  when: ansible_os_family == 'Altlinux'
+  become: true
+
+- name: install ninja
+  package: name=ninja-build state=present
+  become: true
+
+- name: install perl on ALT Linux
+  package: name=perl-base state=present
   when: ansible_os_family == 'Altlinux'
   become: true
