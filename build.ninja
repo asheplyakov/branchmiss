@@ -6,10 +6,10 @@ stackcollapse = ./3rdparty/FlameGraph/stackcollapse-perf.pl
 flamegraph = ./3rdparty/FlameGraph/flamegraph.pl
 
 rule cc_static_debug
-   command = gcc-8 $cflags_debug -static -o $out $in
+   command = gcc-10 $cflags_debug -static -o $out $in
 
 rule cc_static
-   command = gcc-8 $cflags -static -o $out $in
+   command = gcc-10 $cflags -static -o $out $in
 
 rule profile
    command = perf record --event=branch-miss --call-graph=fp -o $out ./$in

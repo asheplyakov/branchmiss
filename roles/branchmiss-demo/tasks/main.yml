@@ -17,17 +17,17 @@
   when: ansible_os_family == 'Altlinux'
   become: true
 
-- name: install gcc version 8 on Debian
+- name: install gcc version 10 on Debian
   package: name={{ item }} state=present
   with_items:
-    - gcc-8
+    - gcc-10
   when: ansible_os_family == 'Debian'
   become: true
 
-- name: install gcc version 8 on ALT Linux
+- name: install gcc version 10 on ALT Linux
   package: name={{ item }} state=present
   with_items:
-    - gcc8
+    - gcc10
     - glibc-devel-static
   when: ansible_os_family == 'Altlinux'
   become: true
