@@ -390,3 +390,32 @@ Almost 10x faster than non-optimized variant. Why?
 * Don't benchmark `Debug` builds, ever
 * Better not use `Debug` builds at all
 * Premature optimization is root of all evil
+
+---
+
+### P.S. Processor performance is not measured in GHz
+
+The following table lists the run time of non-optimized (compiled with `-O0`)
+`partsum` and `rand_partsum` measured with `perf stat` on different CPUs/boards:
+
+|                  | Intel Core i7-7700HQ  | AMD Ryzen 5 2600  | Baikal-T1 (MIPS P5600) |  U740 (RISC-V)   |  U540 (RISC-V)   |
+| :--------------- | :-------------------: | :---------------: | :--------------------: | :--------------: | :--------------: |
+| instructions     |  5 756 616 461        |  5 755 856 610    |  12 522 218 790        |  10 554 022 119  |  10 533 849 293  |
+| seconds user     |  0.96  /   2.40       |  1.09  / 1.66     |  6.20  / 11.35         |  9.46  / 10.82   |  16.10 / 17.32   |
+| insns per cycle  |  1.63  /   0.66       |  1.40  / 0.90     |  1.69  /  0.85         |  0.93  /  0.81   |   0.65 /  0.61   |
+| branch miss, %   |  0.03% /  17,32%      |  0.02% / 8.20%    |  0.03% / 23.93%        |    -- N/A --     |     -- N/A --    |
+| clock rate       |  2.8 GHz              |  3.4 GHz          |  1.2 GHz               |  1 GHz           |  1 GHz           |
+
+
+(branch miss counts are not available for RISC-V boards due to kernel issues)
+
+- Baikal-T1 is indeed superscalar and out-of-order.
+  Thus `partsum` is almost 2x faster than `rand_partsum` on this SoC.
+- U740 is superscalar, but in-order. So superscalar execution makes `partsum` only 15% faster
+- U540 is in-order with a classical pipeline. No superscalar execution here.
+- The simple the core the less the difference between `partsum` and `rand_partsum` run time is
+
+- U740, U540 have the same clock rate, however the `partsum` benchmark runs 1.7x faster on U740
+- Baikal-T1 runs `partsum` 1.5x faster than U740, however the clock rate of Baikal-T1 is only 1.2x faster
+- The clock rate of Core i7-7700HQ is 2.3 faster than that of Baikal-T1,
+  however Core i7 runs `partsum` almost 10x faster.
