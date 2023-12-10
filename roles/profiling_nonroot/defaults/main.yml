@@ -1,0 +1,7 @@
+---
+
+# when non-root profiling is enabled
+perf_event_mlock_kb_high: 65536
+
+# when non-root profiling is disabled
+perf_event_mlock_kb_low: 1024

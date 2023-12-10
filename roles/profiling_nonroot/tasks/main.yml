@@ -3,10 +3,14 @@
 - name: check kernel.perf_event_paranoid knob
   command: sysctl -n kernel.perf_event_paranoid
   register: perf_event_paranoid_out
+  environment:
+    PATH: "/sbin:/usr/sbin:/bin:/usr/bin"
   changed_when: False
 
 - name: disable kernel.perf_event_paranoid
   command: sysctl -w kernel.perf_event_paranoid=0
+  environment:
+    PATH: "/sbin:/usr/sbin:/bin:/usr/bin"
   when:
     - revert is undefined or not(revert|default('false')|bool)
     - perf_event_paranoid_out.stdout_lines[0] != '0'
@@ -14,18 +18,51 @@
 
 - name: enable kernel.perf_event_paranoid
   command: sysctl -w kernel.perf_event_paranoid=1
+  environment:
+    PATH: "/sbin:/usr/sbin:/bin:/usr/bin"
   when:
     - revert is defined and revert|bool
     - perf_event_paranoid_out.stdout_lines[0] == '0'
   become: true
 
+- name: check kernel.perf_event_mlock_kb
+  command: sysctl -n kernel.perf_event_mlock_kb
+  register: perf_event_mlock_kb
+  environment:
+    PATH: "/sbin:/usr/sbin:/bin:/usr/bin"
+  changed_when: False
+
+- name: bump perf_event_mlock_kb
+  command: >
+    sysctl -w kernel.perf_event_mlock_kb={{ perf_event_mlock_kb_high }}
+  environment:
+    PATH: "/sbin:/usr/sbin:/bin:/usr/bin"
+  when:
+    - revert is undefined or not(revert|default('false')|bool)
+    - perf_event_mlock_kb.stdout_lines[0].strip()|int < perf_event_mlock_kb_high|int
+  become: true
+
+- name: lower perf_event_mlock_kb
+  command: sysctl -w kernel.perf_event_mlock_kb={{ perf_event_mlock_kb_low }}
+  environment:
+    PATH: "/sbin:/usr/sbin:/bin:/usr/bin"
+  when:
+    - revert is defined or revert|bool
+    - perf_event_mlock_kb.stdout_lines[0].strip()|int > perf_event_mlock_kb_low|int
+  become: true
+
+
 - name: check kernel.kptr_restrict
   command: sysctl -n kernel.kptr_restrict
+  environment:
+    PATH: "/sbin:/usr/sbin:/bin:/usr/bin"
   register: kptr_restrict_out
   changed_when: False
 
 - name: disable kernel.kptr_restrict
   command: sysctl -w kernel.kptr_restrict=0
+  environment:
+    PATH: "/sbin:/usr/sbin:/bin:/usr/bin"
   when:
     - revert is undefined or not(revert|default('false')|bool)
     - kptr_restrict_out.stdout_lines[0] != '0'
