@@ -409,6 +409,15 @@ The following table lists the run time of non-optimized (compiled with `-O0`)
 
 (branch miss counts are not available for RISC-V boards due to kernel issues)
 
+|                  | Loongson 3A5000  |
+| :--------------- | :--------------: |
+| instructions     |  10 262 426 188  |
+| seconds user     |  1.85  /  4.26   |
+| insns per cycle  |  2.22  /  0.96   |
+| branch miss, %   |  0.10% / 23.51%  |
+| clock rate       |  2.5 GHz         |
+
+
 - Baikal-T1 is indeed superscalar and out-of-order.
   Thus `partsum` is almost 2x faster than `rand_partsum` on this SoC.
 - U740 is superscalar, but in-order. So superscalar execution makes `partsum` only 15% faster
