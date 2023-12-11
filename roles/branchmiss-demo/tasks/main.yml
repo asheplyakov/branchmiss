@@ -29,7 +29,19 @@
   with_items:
     - gcc10
     - glibc-devel-static
-  when: ansible_os_family == 'Altlinux'
+  when:
+    - ansible_os_family == 'Altlinux'
+    - ansible_architecture != 'loongarch64'
+  become: true
+
+- name: install gcc version 13 on ALT Linux
+  package: name={{ item }} state=present
+  with_items:
+    - gcc13
+    - glibc-devel-static
+  when:
+    - ansible_os_family == 'Altlinux'
+    - ansible_architecture == 'loongarch64'
   become: true
 
 - name: install perf on Ubuntu/Debian
