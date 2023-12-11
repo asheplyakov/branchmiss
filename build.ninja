@@ -1,15 +1,16 @@
 
 cflags_debug = -O0 -g -fno-omit-frame-pointer
-cflags = -O2 -g -fno-omit-frame-pointer -fno-optimize-sibling-calls
+cflags = -O2 -flto -g -fno-omit-frame-pointer -fno-optimize-sibling-calls
+CC = gcc-10
 
 stackcollapse = ./3rdparty/FlameGraph/stackcollapse-perf.pl
 flamegraph = ./3rdparty/FlameGraph/flamegraph.pl
 
 rule cc_static_debug
-   command = gcc-10 $cflags_debug -static -o $out $in
+   command = $CC $cflags_debug -static -o $out $in
 
 rule cc_static
-   command = gcc-10 $cflags -static -o $out $in
+   command = $CC $cflags -static -o $out $in
 
 rule profile
    command = perf record --event=branch-miss --call-graph=fp -o $out ./$in
@@ -40,3 +41,14 @@ build partsum_both_opt.perf.script: perf_script partsum_both_opt.data
 build partsum_both_opt.stacks: collapse_stacks partsum_both_opt.perf.script
 build partsum_both_opt_branchmiss.svg: do_flamegraph partsum_both_opt.stacks
    title = Branch misses, -O2
+
+build ./partsum: cc_static_debug partsum.c
+build ./rand_partsum: cc_static_debug rand_partsum.c
+build ./rand_partsum_nobranch: cc_static_debug rand_partsum_nobranch.c
+build ./rand_partsum_swap: cc_static_debug rand_partsum_swap.c
+
+build ./opt_partsum: cc_static partsum.c
+build ./opt_rand_partsum: cc_static rand_partsum.c
+build ./opt_rand_partsum_nobranch: cc_static rand_partsum_nobranch.c
+build ./opt_rand_partsum_swap: cc_static rand_partsum_swap.c
+
