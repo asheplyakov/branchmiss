@@ -47,7 +47,7 @@
   environment:
     PATH: "/sbin:/usr/sbin:/bin:/usr/bin"
   when:
-    - revert is defined or revert|bool
+    - revert is defined and revert|bool
     - perf_event_mlock_kb.stdout_lines[0].strip()|int > perf_event_mlock_kb_low|int
   become: true
 
